@@ -1,6 +1,4 @@
 <?php
-
-
 return function ($data){
-    return null;
+    return $data;
 };
