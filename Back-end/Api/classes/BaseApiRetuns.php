@@ -2,27 +2,34 @@
 
 namespace classes;
 
+use JetBrains\PhpStorm\NoReturn;
+
 class BaseApiRetuns
 {
-    public static function ReturnError()
+    #[NoReturn] public static function ReturnError($data = null, $message = "an error occurred") :void
     {
-        echo json_encode([
+        self::LogError(json_encode([
             "status" => "error",
-            "message" => "Invalid Endpoint"
-        ]);
-
-        self::LogError();
+            "message" => "$message",
+            "data" => $data
+        ]));
 
         exit();
     }
 
-    public static function ReturnSuccess()
+    #[NoReturn] public static function ReturnSuccess($data, $message) :void
     {
+        echo json_encode([
+            "status" => "success",
+            "message" => "$message",
+            "data" => $data
+        ]);
 
+        exit();
     }
 
-    private static function LogError()
+    #[NoReturn] private static function LogError($message = "Invalid Endpoint"): void
     {
-
+        echo $message;
     }
 }

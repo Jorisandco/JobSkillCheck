@@ -1,9 +1,7 @@
 <?php
 require_once './headers/Headers.php';
 
-use classes\DataBase;
-use classes\Poll;
-use classes\Users;
+use classes\BaseApiRetuns;
 
 // END POINT LIST DEFINITION
 
@@ -11,6 +9,10 @@ $functionFolder = "../functions/";
 $endpoints = [
     "API" =>
         [
+            "empty_function" =>
+                [
+                    "test" => "$functionFolder/empty_function.php"
+                ],
             "User" =>
                 [
                     "Login" => "$functionFolder/User/login.php",
@@ -38,8 +40,12 @@ if (isset($userInput['endpoint'])) {
         $action = $endpointParts[2];
 
         if (isset($endpoints[$category][$subCategory][$action])) {
-            require_once $endpoints[$category][$subCategory][$action];
-            exit();
+            try{
+                $result = require_once $endpoints[$category][$subCategory][$action];
+                BaseApiRetuns::ReturnSuccess($result, "Request Successful");
+            }catch (\Throwable $e){
+                BaseApiRetuns::ReturnError(null, "Endpoint Doesn't exist");
+            }
         }
     }
 }
