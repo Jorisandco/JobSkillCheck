@@ -1,11 +1,17 @@
 <?php
-require_once './headers/Headers.php';
 
-use classes\BaseApiRetuns;
+include "classes/BaseApiReturns.php";
+include "classes/DataBase.php";
+
+use classes\DataBase;
+use classes\BaseApiReturns;
+
+require_once './headers/Headers.php';
 
 // END POINT LIST DEFINITION
 
-$functionFolder = "../functions/";
+$database = new DataBase();
+$functionFolder = "functions";
 $endpoints = [
     "API" =>
         [
@@ -15,8 +21,8 @@ $endpoints = [
                 ],
             "User" =>
                 [
-                    "Login" => "$functionFolder/User/login.php",
-                    "answer" => "$functionFolder/User/answer.php"
+                    "Login" => "$functionFolder/user/login.php",
+                    "answer" => "$functionFolder/user/answer.php"
                 ],
             "Poll" =>
                 [
@@ -27,25 +33,37 @@ $endpoints = [
 ];
 
 // REQUEST HANDLING
-$userInput = json_decode(file_get_contents('php://input'), true);
 
+$userInput = json_decode(file_get_contents('php://input'), true);
 $RequestLink = $_SERVER['REQUEST_URI'];
 
-if (isset($userInput['endpoint'])) {
-    $endpointParts = explode('/', $userInput['endpoint']);
+if (!isset($userInput)) {
+    BaseApiReturns::ReturnError(null, "No endpoint provided");
+    exit();
+}
 
-    if (count($endpointParts) === 3) {
-        $category = $endpointParts[0];
-        $subCategory = $endpointParts[1];
-        $action = $endpointParts[2];
+$endpointParts = explode('/', $RequestLink);
 
-        if (isset($endpoints[$category][$subCategory][$action])) {
-            try{
-                $result = require_once $endpoints[$category][$subCategory][$action];
-                BaseApiRetuns::ReturnSuccess($result, "Request Successful");
-            }catch (\Throwable $e){
-                BaseApiRetuns::ReturnError(null, "Endpoint Doesn't exist");
-            }
-        }
-    }
+if (count($endpointParts) !== 4) {
+    BaseApiReturns::ReturnError(null, "Not a valid endpoint provided");
+    exit();
+}
+
+$category = $endpointParts[1];
+$subCategory = $endpointParts[2];
+$action = $endpointParts[3];
+
+echo !isset($endpoints[$category][$subCategory][$action]) . "\n";
+
+if (!isset($endpoints[$category][$subCategory][$action])) {
+    BaseApiReturns::ReturnError(null, "Endpoint Doesn't exist");
+    exit();
+}
+
+try {
+    $handler = require_once $endpoints[$category][$subCategory][$action];
+    $result = $handler($userInput, $database);
+    BaseApiReturns::ReturnSuccess($result["data"], $result["message"]);
+} catch (\Throwable $e) {
+    BaseApiReturns::ReturnError(null, "$e");
 }

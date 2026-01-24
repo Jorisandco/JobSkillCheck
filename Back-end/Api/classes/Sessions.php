@@ -2,6 +2,8 @@
 
 namespace classes;
 
+include_once 'DataBase.php';
+
 use classes\DataBase;
 
 class Sessions extends DataBase

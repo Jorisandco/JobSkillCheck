@@ -4,6 +4,10 @@ namespace classes;
 
 class DataBase
 {
+    public $Poll;
+    Public $Users;
+    public $Sessions;
+
     private $host = "localhost";
     private $Port = "3306";
     private $db_name = "my_database";
@@ -13,12 +17,19 @@ class DataBase
 
     public function getConnection()
     {
+        // initialize child class
+        $this->Poll = new Poll();
+        $this->Users = new Users();
+        $this->Sessions = new Sessions();
+
         // get data from .env file
         $this->host = getenv('DB_HOST') ?: $this->host;
         $this->Port = getenv('DB_PORT') ?: $this->Port;
         $this->db_name = getenv('DB_NAME') ?: $this->db_name;
         $this->username = getenv('DB_USER') ?: $this->username;
         $this->password = getenv('DB_PASSWORD') ?: $this->password;
+
+        echo $this->host . ":" . $this->Port . " " . $this->db_name . " " . $this->username . " " . $this->password;
     }
 
     public function connect(): ?\PDO

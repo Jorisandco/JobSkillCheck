@@ -2,6 +2,8 @@
 
 namespace classes;
 
+include_once 'DataBase.php';
+
 use classes\DataBase;
 use mysql_xdevapi\CrudOperationBindable;
 
