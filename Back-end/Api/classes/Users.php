@@ -2,10 +2,35 @@
 
 namespace classes;
 
+include_once 'DataBase.php';
+
 use classes\DataBase;
 
 class Users extends DataBase
 {
+    public function GetUserFromSession($session): array|null
+    {
+        try {
+            $this->connect();
+            $query = "SELECT * FROM users 
+                      JOIN usersessions ON users.idUsers = usersessions.UserID 
+                      WHERE usersessions.Session = :session AND usersessions.Expires > NOW()";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                'session' => $session
+            ]);
+
+            $user = $stmt->fetch();
+            $this->disconnect();
+
+            return $user ?: null;
+        } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return null;
+        }
+    }
+
     public function GetUsers($Email): array
     {
         try {

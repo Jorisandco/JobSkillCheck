@@ -2,61 +2,82 @@
 
 namespace classes;
 
+use classes\Poll;
+use classes\Users;
+use classes\Sessions;
+use PDO;
+use PDOException;
+
+require_once "Poll.php";
+require_once "Users.php";
+require_once "Sessions.php";
+
 class DataBase
 {
-    private $host = "localhost";
-    private $Port = "3306";
-    private $db_name = "my_database";
-    private $username = "root";
-    private $password = "";
-    public $conn;
+    private string $host;
+    private int $port;
+    private string $db_name;
+    private string $username;
+    private string $password;
 
-    public function getConnection()
+    protected ?PDO $conn = null;
+
+    public function __construct()
     {
-        // get data from .env file
-        $this->host = getenv('DB_HOST') ?: $this->host;
-        $this->Port = getenv('DB_PORT') ?: $this->Port;
-        $this->db_name = getenv('DB_NAME') ?: $this->db_name;
-        $this->username = getenv('DB_USER') ?: $this->username;
-        $this->password = getenv('DB_PASSWORD') ?: $this->password;
+        $envFile = __DIR__ .  '/../.env';
+
+        $env = parse_ini_file($envFile);
+
+        $this->host     = $env['DB_HOST'] ?? 'localhost';
+        $this->port     = (int)($env['DB_PORT'] ?? 3306);
+        $this->db_name  = $env['DB_NAME'] ?? '';
+        $this->username = $env['DB_USER'] ?? '';
+        $this->password = $env['DB_PASSWORD'] ?? '';
     }
 
-    public function connect(): ?\PDO
+    public function connect(): PDO
     {
-        $this->getConnection();
-        $this->conn = null;
-        try {
-            $this->conn = new \PDO("mysql:host=" . $this->host . ";port=" . $this->Port . ";dbname=" . $this->db_name, $this->username, $this->password);
-            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-            $this->conn->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-            $this->conn->exec("set names utf8");
-        } catch (\PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
+        if ($this->conn !== null) {
+            return $this->conn;
         }
-        return $this->conn;
+
+        try {
+            $connectionString = "mysql:host={$this->host};port={$this->port};dbname={$this->db_name};charset=utf8mb4";
+
+            $this->conn = new PDO($connectionString, $this->username, $this->password);
+
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
+            return $this->conn;
+        } catch (PDOException $e) {
+            error_log("Database connection failed: " . $e->getMessage());
+            throw new \RuntimeException("Database connection failed: " . $e->getMessage());
+        }
     }
 
-    public function disconnect():void
+    public function disconnect(): void
     {
         $this->conn = null;
     }
 
-    public function Rollback():void
+    public function startTransaction(): void
     {
-        if ($this->conn)
-            $this->conn->rollBack();
+        $this->connect()->beginTransaction();
     }
 
-    public function StartTransaction():void
+    public function commit(): void
     {
-        if ($this->conn)
-            $this->conn->beginTransaction();
-    }
-
-    public function EndTransaction():void
-    {
-        if ($this->conn)
+        if ($this->conn && $this->conn->inTransaction()) {
             $this->conn->commit();
+        }
+    }
+
+    public function rollback(): void
+    {
+        if ($this->conn && $this->conn->inTransaction()) {
+            $this->conn->rollBack();
+        }
     }
 }

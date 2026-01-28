@@ -2,23 +2,55 @@
 
 namespace classes;
 
+include_once 'DataBase.php';
+
 use classes\DataBase;
-use mysql_xdevapi\CrudOperationBindable;
 
 class Poll extends DataBase
 {
+    public function GetPollAnswerCount($questionID)
+    {
+        try{
+            $this->connect();
+
+            $query = "SELECT COUNT(*) AS total_answers FROM useranswers WHERE QUESTIONID = :question_id;";
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                'question_id' => $questionID
+            ]);
+
+            $results = $stmt->fetchAll();
+
+            $this->disconnect();
+
+            return $results;
+        } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return null;
+        }
+    }
+
     public function GetPoll($poll_id)
     {
         try {
             $this->connect();
 
-            $query = "SELECT * FROM polls WHERE id = :poll_id";
+            $query = "SELECT Expires, Question FROM polls WHERE idPolls = :poll_id";
             $stmt = $this->conn->prepare($query);
 
             $stmt->execute([
                 'poll_id' => $poll_id
             ]);
             $poll = $stmt->fetch();
+
+            $query = "SELECT idPoll_answers, Answer, BarColour FROM poll_answers WHERE PollID = :poll_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                'poll_id' => $poll_id
+            ]);
+
+            $poll['answers'] = $stmt->fetchAll();
 
             $this->disconnect();
 
@@ -29,7 +61,7 @@ class Poll extends DataBase
         }
     }
 
-    public function CreatePoll($question, $userID, $expire, $pollAnswers) :bool
+    public function CreatePoll($question, $userID, $expire, $pollAnswers) :bool | int
     {
         try {
             $this->connect();
@@ -38,9 +70,11 @@ class Poll extends DataBase
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':question' => $question,
-                ':options' => $userID,
-                ':created_at' => $expire
+                ':user' => $userID,
+                ':expires' => $expire
             ]);
+
+            $pollID = $this->conn->lastInsertId();
 
             $sql = "INSERT INTO poll_answers (PollID, Answer, BarColour) VALUES (:poll_id, :answer, :barcolour)";
             $pollID = $this->conn->lastInsertId();
@@ -56,8 +90,9 @@ class Poll extends DataBase
 
             $this->disconnect();
 
-            return true;
+            return $pollID;
         } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
             return false;
         }
     }
@@ -126,6 +161,26 @@ class Poll extends DataBase
     {
         try {
             $this->connect();
+
+            $sql = "SELECT * FROM useranswers WHERE USERID = :user_id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':user_id' => $userID,
+            ]);
+
+            $existingVote = $stmt->fetch();
+            if ($existingVote["QUESTIONID"] === $answerID) {
+                return false;
+            }
+
+            if($existingVote){
+                $sql = "DELETE FROM useranswers WHERE USERID = :user_id";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([
+                    ':user_id' => $userID,
+                ]);
+            }
+
 
             $sql = "INSERT INTO useranswers (USERID, QUESTIONID) VALUES (:user_id, :answer_id)";
             $stmt = $this->conn->prepare($sql);
