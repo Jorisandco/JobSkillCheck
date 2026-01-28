@@ -22,7 +22,7 @@ content:
   - type: url
     attrs:
       uid: e6177860-8f29-469b-a3d6-97dfdd0e44fe
-    content: "{{BASE_URL}}/User/answer"
+    content: "{{BASE_URL}}/Poll/get-poll-answers"
 ---
 ```
 
@@ -31,10 +31,9 @@ content:
 type: json_body
 attrs:
   uid: 0d13485d-dae2-4666-9e39-ff41521a9d59
-  body: >-
+  body: |-
     {
-      "Session" : "7ab96fc70c125f7c889424f4c7ffdba1e28288b7983d5226af5a464b3a80ef7f",
-      "ANSWER_ID"  : 30
+      "POLL_ID" : 11
     }
 ---
 ```

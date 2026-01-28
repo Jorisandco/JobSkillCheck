@@ -29,7 +29,8 @@ $endpoints = [
             "Poll" =>
                 [
                     "get-poll-data" => "$functionFolder/Poll/getPollData.php",
-                    "submitPoll" => "$functionFolder/Poll/submitPoll.php"
+                    "submitPoll" => "$functionFolder/Poll/submitPoll.php",
+                    "get-poll-answers" => "$functionFolder/Poll/GetPollAnswers.php"
                 ]
         ]
 ];

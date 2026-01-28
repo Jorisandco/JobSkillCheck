@@ -8,6 +8,29 @@ use classes\DataBase;
 
 class Poll extends DataBase
 {
+    public function GetPollAnswerCount($questionID)
+    {
+        try{
+            $this->connect();
+
+            $query = "SELECT COUNT(*) AS total_answers FROM useranswers WHERE QUESTIONID = :question_id;";
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                'question_id' => $questionID
+            ]);
+
+            $results = $stmt->fetchAll();
+
+            $this->disconnect();
+
+            return $results;
+        } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return null;
+        }
+    }
+
     public function GetPoll($poll_id)
     {
         try {
@@ -138,6 +161,26 @@ class Poll extends DataBase
     {
         try {
             $this->connect();
+
+            $sql = "SELECT * FROM useranswers WHERE USERID = :user_id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([
+                ':user_id' => $userID,
+            ]);
+
+            $existingVote = $stmt->fetch();
+            if ($existingVote["QUESTIONID"] === $answerID) {
+                return false;
+            }
+
+            if($existingVote){
+                $sql = "DELETE FROM useranswers WHERE USERID = :user_id";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->execute([
+                    ':user_id' => $userID,
+                ]);
+            }
+
 
             $sql = "INSERT INTO useranswers (USERID, QUESTIONID) VALUES (:user_id, :answer_id)";
             $stmt = $this->conn->prepare($sql);
