@@ -2,4 +2,4 @@
 
 dist
 /node_modules/
-/Back-end/.env
+/Back-end/Api/.env
