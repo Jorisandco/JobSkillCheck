@@ -14,22 +14,22 @@ $database = new DataBase();
 
 $functionFolder = "functions";
 $endpoints = [
-    "API" =>
+    "api" =>
         [
             "empty_function" =>
                 [
                     "test" => "$functionFolder/empty_function.php"
                 ],
-            "User" =>
+            "user" =>
                 [
-                    "Login" => "$functionFolder/user/login.php",
+                    "login" => "$functionFolder/user/login.php",
                     "answer" => "$functionFolder/user/answer.php",
                     "is-logged-in" => "$functionFolder/user/isLoggedIn.php"
                 ],
-            "Poll" =>
+            "poll" =>
                 [
                     "get-poll-data" => "$functionFolder/Poll/getPollData.php",
-                    "submitPoll" => "$functionFolder/Poll/submitPoll.php",
+                    "submit-poll" => "$functionFolder/Poll/submitPoll.php",
                     "get-poll-answers" => "$functionFolder/Poll/GetPollAnswers.php"
                 ]
         ]
