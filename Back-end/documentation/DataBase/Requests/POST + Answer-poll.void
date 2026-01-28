@@ -22,7 +22,7 @@ content:
   - type: url
     attrs:
       uid: e6177860-8f29-469b-a3d6-97dfdd0e44fe
-    content: "{{BASE_URL}}/User/answer"
+    content: "{{BASE_URL}}/user/answer"
 ---
 ```
 

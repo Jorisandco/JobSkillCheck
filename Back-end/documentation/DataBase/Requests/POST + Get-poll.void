@@ -22,7 +22,7 @@ content:
   - type: url
     attrs:
       uid: 6260cd67-4cf3-4f04-a5b5-53237383d7f5
-    content: "{{BASE_URL}}/Poll/get-poll-data"
+    content: "{{BASE_URL}}/poll/get-poll-data"
 ---
 ```
 

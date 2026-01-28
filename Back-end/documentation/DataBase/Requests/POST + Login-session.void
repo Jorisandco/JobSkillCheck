@@ -22,7 +22,7 @@ content:
   - type: url
     attrs:
       uid: f46554ad-2fd2-4d90-ae9f-093085054d8a
-    content: "{{BASE_URL}}/User/is-logged-in"
+    content: "{{BASE_URL}}/user/is-logged-in"
 ---
 ```
 
