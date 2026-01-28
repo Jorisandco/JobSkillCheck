@@ -16,10 +16,6 @@ $functionFolder = "functions";
 $endpoints = [
     "api" =>
         [
-            "empty_function" =>
-                [
-                    "test" => "$functionFolder/empty_function.php"
-                ],
             "user" =>
                 [
                     "login" => "$functionFolder/user/login.php",
