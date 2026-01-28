@@ -8,7 +8,7 @@ use classes\DataBase;
 
 class Poll extends DataBase
 {
-    public function GetPollAnswerCount($questionID)
+    public function GetPollAnswerCount($questionID) : array|null
     {
         try{
             $this->connect();

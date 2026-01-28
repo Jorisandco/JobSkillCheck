@@ -34,9 +34,7 @@ return function ($data): array {
     }
 
     $existingUser = $existingUsers[0];
-
     $User_session = $sessions->CreateSession($existingUser["idUsers"], $loggedInTime);
-
 
     return [
         "data" => [
