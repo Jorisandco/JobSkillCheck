@@ -28,7 +28,7 @@ $endpoints = [
                 ],
             "Poll" =>
                 [
-                    "getPollData" => "$functionFolder/Poll/getPollData.php",
+                    "get-poll-data" => "$functionFolder/Poll/getPollData.php",
                     "submitPoll" => "$functionFolder/Poll/submitPoll.php"
                 ]
         ]
@@ -40,7 +40,7 @@ $userInput = json_decode(file_get_contents('php://input'), true);
 $RequestLink = $_SERVER['REQUEST_URI'];
 
 if (!isset($userInput)) {
-    BaseApiReturns::ReturnError(null, "No endpoint provided");
+    BaseApiReturns::ReturnError(null, "No Data provided");
     exit();
 }
 
