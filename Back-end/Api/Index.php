@@ -11,6 +11,7 @@ require_once './headers/Headers.php';
 // END POINT LIST DEFINITION
 
 $database = new DataBase();
+
 $functionFolder = "functions";
 $endpoints = [
     "API" =>
@@ -22,7 +23,8 @@ $endpoints = [
             "User" =>
                 [
                     "Login" => "$functionFolder/user/login.php",
-                    "answer" => "$functionFolder/user/answer.php"
+                    "answer" => "$functionFolder/user/answer.php",
+                    "is-logged-in" => "$functionFolder/user/isLoggedIn.php"
                 ],
             "Poll" =>
                 [

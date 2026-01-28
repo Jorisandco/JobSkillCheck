@@ -5,6 +5,7 @@ namespace classes;
 include_once 'DataBase.php';
 
 use classes\DataBase;
+use Random\RandomException;
 
 class Sessions extends DataBase
 {
@@ -13,7 +14,7 @@ class Sessions extends DataBase
         try {
             $this->connect();
 
-            $query = "SELECT * FROM sessions WHERE user_id = :user";
+            $query = "SELECT * FROM usersessions WHERE UserID = :user";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
                 ":user" => $UserID
@@ -28,22 +29,36 @@ class Sessions extends DataBase
         }
     }
 
-    public function CreateSession($UserID, $Token, $Expiry): bool
+    /**
+     * @throws RandomException
+     */
+    private function CreateSessionToken() : string
+    {
+        try {
+            return bin2hex(random_bytes(32));
+        } catch (RandomException $e) {
+            throw new RandomException("Failed to generate session token");
+        }
+    }
+
+    public function CreateSession($UserID, $Expiry): bool | string
     {
         try {
             $this->connect();
 
-            $query = "INSERT INTO sessions (user_id, token, expiry) VALUES (:user, :token, :expiry)";
+            $sessionToken = $this->CreateSessionToken();
+
+            $query = "INSERT INTO usersessions (UserID, Session, Expires) VALUES (:user, :token, :expiry)";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
                 ":user" => $UserID,
-                ":token" => $Token,
+                ":token" => $sessionToken,
                 ":expiry" => $Expiry
             ]);
 
             $this->disconnect();
 
-            return true;
+            return $sessionToken;
         } catch (\PDOException $e) {
             return false;
         }
@@ -54,7 +69,7 @@ class Sessions extends DataBase
         try {
             $this->connect();
 
-            $query = "UPDATE sessions SET expiry = :expiry WHERE user_id = :user";
+            $query = "UPDATE usersessions SET Expires = :expiry WHERE UserID = :user";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
                 ":user" => $UserID,
@@ -74,7 +89,7 @@ class Sessions extends DataBase
         try {
             $this->connect();
 
-            $query = "DELETE FROM sessions WHERE expiry < NOW()";
+            $query = "DELETE FROM usersessions WHERE Expires < NOW()";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
 
@@ -91,7 +106,7 @@ class Sessions extends DataBase
         try {
             $this->connect();
 
-            $query = "DELETE FROM sessions WHERE user_id = :user";
+            $query = "DELETE FROM usersessions WHERE user_id = :user";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([
                 ":user" => $userID
