@@ -5,7 +5,6 @@ namespace classes;
 include_once 'DataBase.php';
 
 use classes\DataBase;
-use mysql_xdevapi\CrudOperationBindable;
 
 class Poll extends DataBase
 {
@@ -14,13 +13,21 @@ class Poll extends DataBase
         try {
             $this->connect();
 
-            $query = "SELECT * FROM polls WHERE id = :poll_id";
+            $query = "SELECT Expires, Question FROM polls WHERE idPolls = :poll_id";
             $stmt = $this->conn->prepare($query);
 
             $stmt->execute([
                 'poll_id' => $poll_id
             ]);
             $poll = $stmt->fetch();
+
+            $query = "SELECT idPoll_answers, Answer, BarColour FROM poll_answers WHERE PollID = :poll_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                'poll_id' => $poll_id
+            ]);
+
+            $poll['answers'] = $stmt->fetchAll();
 
             $this->disconnect();
 
@@ -31,7 +38,7 @@ class Poll extends DataBase
         }
     }
 
-    public function CreatePoll($question, $userID, $expire, $pollAnswers) :bool
+    public function CreatePoll($question, $userID, $expire, $pollAnswers) :bool | int
     {
         try {
             $this->connect();
@@ -40,9 +47,11 @@ class Poll extends DataBase
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':question' => $question,
-                ':options' => $userID,
-                ':created_at' => $expire
+                ':user' => $userID,
+                ':expires' => $expire
             ]);
+
+            $pollID = $this->conn->lastInsertId();
 
             $sql = "INSERT INTO poll_answers (PollID, Answer, BarColour) VALUES (:poll_id, :answer, :barcolour)";
             $pollID = $this->conn->lastInsertId();
@@ -58,8 +67,9 @@ class Poll extends DataBase
 
             $this->disconnect();
 
-            return true;
+            return $pollID;
         } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
             return false;
         }
     }
