@@ -6,21 +6,17 @@ export class Cookie {
         document.cookie = name + "=" + value + ";" + expires + ";path=/";
     }
 
+// Function to get a cookie by name
     static getCookie(name) {
         const cookieName = name + "=";
         const decodedCookie = decodeURIComponent(document.cookie);
-        const cookie = decodedCookie.split(";");
-        cookie.forEach(element => {
-                let c = element;
-                while (c.charAt(0) === " ") {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(cookieName) === 0) {
-                    return c.substring(cookieName.length, c.length);
-                }
+        const cookies = decodedCookie.split(";");
+        for (let c of cookies) {
+            c = c.trim();
+            if (c.indexOf(cookieName) === 0) {
+                return c.substring(cookieName.length);
             }
-        );
-
+        }
         return null;
     }
 

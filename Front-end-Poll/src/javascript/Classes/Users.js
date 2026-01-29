@@ -1,12 +1,9 @@
 import {APICals} from "./API.js";
 import {Cookie} from "./Cookie.js";
+import $ from "jquery"
 
 export class Users {
-    sessionToken;
-
-    constructor(sessionToken) {
-        this.sessionToken = sessionToken;
-    }
+    sessionToken = Cookie.getCookie("Session")
 
     async IsUserLoggedIn() {
         const api = new APICals();
@@ -19,25 +16,26 @@ export class Users {
                 return false;
             }
 
-            return response.isLoggedIn;
+            return response.data.isLoggedIn;
         } catch (error) {
             console.error("Error checking user login status:", error);
             return false;
         }
     }
 
-    async login() {
+    async login(email, stayLogged) {
         const api = new APICals();
         try {
             const response = await api.post("/user/login", {
-                Session: this.sessionToken
+                EMAIL: email,
+                stayLoggedIn: stayLogged
             });
 
             if (response.success === false) {
                 return false;
             }
 
-            Cookie.setCookie("Session", response.newSessionToken, 1);
+            Cookie.setCookie("Session", response.data.SESSION_ID, 1);
 
             return response.userData;
         } catch (error) {
