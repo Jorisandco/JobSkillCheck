@@ -1,19 +1,10 @@
-class Users {
-    private Email: string;
+import { APICals } from "./API";
+import { Cookie } from "./Cookie";
 
-    constructor(email: string) {
-        this.Email = email;
-    }
+export class Users {
+    private sessionToken: string;
 
-    public HasAnsweredQuestion(): boolean {
-        if (this.MadeQuestion())
-            return true;
-
-
-
-    }
-
-    private MadeQuestion(): boolean {
-        return true;
+    constructor(sessionToken: string) {
+        this.sessionToken = sessionToken;
     }
 }
