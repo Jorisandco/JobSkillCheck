@@ -1,1 +1,0 @@
-# functions In class Poll

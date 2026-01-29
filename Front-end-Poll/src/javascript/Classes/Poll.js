@@ -1,29 +1,15 @@
 import $ from 'jquery';
-import {APICals} from "./API";
+import {APICals} from "./API.js";
 
 export class Poll {
-    private LinkExtension: string = "/polls";
-    private PollID: number;
+     LinkExtension = "/poll";
+     PollID;
 
-    constructor(pollID: number) {
+    constructor(pollID) {
         this.PollID = pollID;
     }
 
-    public async SubmitAnswer(answerID: number): Promise<boolean> {
-        const api = new APICals();
-        try {
-            const response = await api.post(this.LinkExtension + 'submitPollAnswer', {
-                pollID: this.PollID,
-                answerID: answerID
-            });
-            return response.success;
-        } catch (error) {
-            console.error("Error submitting poll answer:", error);
-            return false;
-        }
-    }
-
-    public async GetPollResults(): Promise<any> {
+     async GetPollResults(){
         const api = new APICals();
         try {
             const response = await api.post(this.LinkExtension + '/getPollResults', {
@@ -36,7 +22,7 @@ export class Poll {
         }
     }
 
-    public async HasUserAnswered(userID: number): Promise<boolean> {
+     async HasUserAnswered(userID){
         const api = new APICals();
         try {
             const response = await api.post(this.LinkExtension + '/hasUserAnswered', {
@@ -50,7 +36,7 @@ export class Poll {
         }
     }
 
-    public async CreatePoll(question: string, answers: string[]): Promise<boolean> {
+     async CreatePoll(question, answers){
         const api = new APICals();
         try {
             const response = await api.post(this.LinkExtension + '/createPoll', {

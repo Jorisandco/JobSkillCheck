@@ -3,4 +3,5 @@
 dist
 /node_modules/
 /Back-end/Api/.env
-/Front-end/Typescript/.env
+/Front-end-Poll/src/.env
+/Front-end/node_modules/

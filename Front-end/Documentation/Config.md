@@ -1,1 +1,0 @@
-# config file for Front-end Documentation
