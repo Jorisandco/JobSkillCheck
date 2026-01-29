@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import {APICals} from "./API.js";
+import {Cookie} from "./Cookie.js";
 
 export class Poll {
      LinkExtension = "/poll";
@@ -36,15 +37,17 @@ export class Poll {
         }
     }
 
-     async CreatePoll(question, answers){
+     async CreatePoll(question, answers, exp){
         const api = new APICals();
         try {
-            const response = await api.post(this.LinkExtension + '/createPoll', {
-                question: question,
-                answers: answers
+            const response = await api.post(this.LinkExtension + '/submit-poll', {
+                QUESTION: question,
+                EXPIRES: exp,
+                ANSWERS: answers,
+                Session: Cookie.getCookie("Session")
             });
 
-            return response.success;
+            return response;
         } catch (error) {
             console.error("Error creating poll:", error);
             return false;
