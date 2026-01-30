@@ -5,7 +5,6 @@ import {Cookie} from "./Cookie.js";
 export class Poll {
     LinkExtension = "/poll";
     PollID;
-    answers = [];
 
     constructor(pollID) {
         this.PollID = pollID;
@@ -67,7 +66,7 @@ export class Poll {
         }
     }
 
-    AddPollToFrontend(answers, MainQuestion, expiry) {
+    AddPollToFrontend(answers, MainQuestion, expiry, loggedin = true) {
 
         let formPoll = `
         <div class="poll-expiry">Poll expires on: ${expiry}</div>
@@ -93,20 +92,19 @@ export class Poll {
         `;
         });
 
-        formPoll += `</form> <button id="submit-poll-answer">Submit Answer</button>`;
+        formPoll += `</form> ${loggedin ? '<button id="submit-poll-answer">Submit Answer</button>' : ""}`;
 
         $("#poll").html(formPoll);
 
-        this.answers = answers;
     }
 
-    RevealAnswers(answers, expired = false) {
+    RevealAnswers(answers, question, expired = false, ) {
         const totalVotes = answers.reduce(
             (sum, a) => sum + a[0].total_answers,
             0
         ) || 1;
 
-        let html = `<div class="poll-results">`;
+        let html = `<div class="poll-results"> <h1>${question}</h1>`;
 
         answers.forEach((a) => {
             const votes = a[0].total_answers;

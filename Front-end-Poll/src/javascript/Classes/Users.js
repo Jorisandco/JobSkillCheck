@@ -1,6 +1,5 @@
 import {APICals} from "./API.js";
 import {Cookie} from "./Cookie.js";
-import $ from "jquery"
 
 export class Users {
     sessionToken = Cookie.getCookie("Session")
@@ -31,13 +30,13 @@ export class Users {
                 stayLoggedIn: stayLogged
             });
 
-            if (response.success === false) {
+            if (response.status === "error") {
                 return false;
             }
 
             Cookie.setCookie("Session", response.data.SESSION_ID, 1);
 
-            return response.userData;
+            return response;
         } catch (error) {
             console.error("Error during user login:", error);
             return null;

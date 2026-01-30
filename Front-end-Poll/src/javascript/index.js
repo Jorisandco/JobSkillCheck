@@ -5,22 +5,19 @@ import $ from "jquery";
 const user = new Users();
 const urlParams = new URLSearchParams(window.location.search);
 const pollID = urlParams.get("pollID");
-
-const loggedIn = await user.IsUserLoggedIn()
+const loggedIn = user.IsUserLoggedIn()
 
 if (loggedIn === false) {
     $(".email-form").css("display", "flex");
 }
 
 $("#login").on("click", async function () {
-    const userData = await user.login(
-        $("#email").val().toString(),
-        true
-    );
-
+    const userData = await user.login($("#email").val().toString(), true);
     if (userData.status === "success") {
-        alert("Login successful! Welcome, " + userData.name);
+        console.log("hi")
+        alert("Login successful! Welcome");
         $(".email-form").css("display", "none");
+        window.location.reload();
     } else {
         alert("Login failed. Please try again.");
     }
@@ -36,7 +33,7 @@ if (pollID === null) {
         $("#add-answer").click(() => {
             const newBlock = `
             <div class="selection">
-                <input type="text" class="answer-text" placeholder="Enter answer option"/>
+                <input maxlength="128"  type="text" class="answer-text" placeholder="Enter answer option"/>
                 <input type="color" class="answer-color" value="#ff0000"/>
                 <button class="remove-answer">Remove</button>
             </div>
@@ -79,7 +76,6 @@ if (pollID === null) {
             }
         })
 
-        // Set minimum date-time for poll expiry to current date-time
         const future = new Date();
         future.setHours(future.getHours() + 1);
 
@@ -96,11 +92,18 @@ if (pollID === null) {
 }
 
 
-
 if (pollID) {
     $(document).ready(async () => {
         const poll = new Poll(pollID);
         const results = await poll.GetPoll();
+
+        if (await user.IsUserLoggedIn() === false) {
+            $(".email-form").css("display", "flex");
+            poll.AddPollToFrontend(results.data.answers, results.data.Question, results.data.Expires, false);
+            $("#Create-pollForm").css("display", "none");
+            return;
+        }
+
         const hasUserAnswered = await poll.HasUserAnswered(user.sessionToken);
 
         function expired() {
@@ -111,12 +114,11 @@ if (pollID) {
             if (!hasUserAnswered.data.has_answered && !expired()) {
                 poll.AddPollToFrontend(results.data.answers, results.data.Question, results.data.Expires);
                 $("#Create-pollForm").css("display", "none");
-            }
-            else {
+            } else {
                 const pollResults = await poll.GetPollResults();
 
                 if (pollResults.status === "success") {
-                    poll.RevealAnswers(pollResults.data, expired());
+                    poll.RevealAnswers(pollResults.data, results.data.Question, expired());
                 } else {
                     console.error("Failed to fetch poll results.");
                 }
@@ -141,7 +143,7 @@ if (pollID) {
             if (answerSubmitted.status === "success") {
                 const results = await poll.GetPollResults();
                 $("#poll").empty();
-                poll.RevealAnswers(results.data);
+                poll.RevealAnswers(results.data, results.data.Question);
             } else {
                 alert("Failed to submit your answer. Please try again.");
             }

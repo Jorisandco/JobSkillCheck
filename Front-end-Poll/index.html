@@ -19,17 +19,18 @@
         <div id="Create-pollForm">
             <label for="poll-question">Create a Poll:</label>
             <input type="text" id="poll-question" placeholder="Enter your poll question here"/>
-            <button id="add-answer">Add Answer</button>
+            <label for="poll-expiry">Poll Expiry Date and Time:</label>
             <input type="datetime-local" id="poll-expiry"/>
+            <button id="add-answer">Add Answer</button>
             <div class="answers">
                 <!--                answer with colour picker-->
                 <div class="selection">
-                    <input type="text" class="answer-text" placeholder="Enter answer option"/>
+                    <input maxlength="128" type="text" class="answer-text" placeholder="Enter answer option"/>
                     <input type="color" class="answer-color" value="#ff0000"/>
                     <button class="remove-answer">Remove</button>
                 </div>
                 <div class="selection">
-                    <input type="text" class="answer-text" placeholder="Enter answer option"/>
+                    <input maxlength="128" type="text" class="answer-text" placeholder="Enter answer option"/>
                     <input type="color" class="answer-color" value="#ff0000"/>
                     <button class="remove-answer">Remove</button>
                 </div>
@@ -40,11 +41,11 @@
 
     <!--visible when not logged in -->
     <div class="email-form">
-        <p>Get Poll Results via Email</p>
+        <p style="color: red">This site requires your email to track who answered</p>
         <div>
             <label for="email">Email Address:</label>
             <input type="email" id="email" name="email" required/>
-            <button id="login">Login</button>
+            <button id="login">submit</button>
         </div>
     </div>
 </div>
