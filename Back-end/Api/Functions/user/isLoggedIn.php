@@ -12,13 +12,19 @@ return function ($data) {
     $user = $Users->GetUserFromSession($data["Session"]);
 
     if($user === null) {
-        throw new Exception("Invalid or expired session");
+        return [
+            "data" => [
+               "isLoggedIn" => false
+            ],
+            "message" => "not logged in"
+        ];
     }
 
     return [
         "data" => [
             "USER_ID" => $user["idUsers"],
             "EMAIL" => $user["Email"],
+            "isLoggedIn" => true
         ],
         "message" => "successful login"
     ];

@@ -98,11 +98,13 @@ export class Poll {
 
     }
 
-    RevealAnswers(answers, question, expired = false, ) {
+    RevealAnswers(answers, question, expired = false) {
         const totalVotes = answers.reduce(
             (sum, a) => sum + a[0].total_answers,
             0
         ) || 1;
+
+        console.log(question)
 
         let html = `<div class="poll-results"> <h1>${question}</h1>`;
 

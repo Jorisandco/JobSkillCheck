@@ -5,11 +5,6 @@ import $ from "jquery";
 const user = new Users();
 const urlParams = new URLSearchParams(window.location.search);
 const pollID = urlParams.get("pollID");
-const loggedIn = user.IsUserLoggedIn()
-
-if (loggedIn === false) {
-    $(".email-form").css("display", "flex");
-}
 
 $("#login").on("click", async function () {
     const userData = await user.login($("#email").val().toString(), true);
@@ -29,7 +24,14 @@ if (pollID === null) {
         $(this).closest(".selection").remove();
     });
 
-    $(document).ready(() => {
+    $(document).ready(async () => {
+        const loggedInStatus = await user.IsUserLoggedIn();
+
+        if (loggedInStatus === false) {
+            $(".email-form").css("display", "flex");
+            $("#create-poll").css("display", "none");
+        }
+
         $("#add-answer").click(() => {
             const newBlock = `
             <div class="selection">
@@ -141,9 +143,9 @@ if (pollID) {
             const answerSubmitted = await user.answerQuestion(selectedAnswer);
 
             if (answerSubmitted.status === "success") {
-                const results = await poll.GetPollResults();
+                const resultsPoll = await poll.GetPollResults();
                 $("#poll").empty();
-                poll.RevealAnswers(results.data, results.data.Question);
+                poll.RevealAnswers(resultsPoll.data, results.data.Question);
             } else {
                 alert("Failed to submit your answer. Please try again.");
             }
