@@ -47,12 +47,10 @@ export class Users {
     async answerQuestion(answerId) {
         const api = new APICals();
         try {
-            const response = await api.post("/user/answer-question", {
+            return await api.post("/user/answer", {
                 Session: this.sessionToken,
-                answerID: answerId,
+                ANSWER_ID: answerId,
             });
-
-            return response.success;
         } catch (error) {
             console.error("Error submitting answer to question:", error);
             return false;

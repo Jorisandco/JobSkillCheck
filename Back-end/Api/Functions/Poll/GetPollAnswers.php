@@ -8,7 +8,7 @@ return function ($data) {
     $poll_data = $poll->GetPoll($data["POLL_ID"]);
     $options = $poll_data["answers"];
     foreach ($options as $option) {
-        $pollData[] = [$option["Answer"] => $poll->GetPollAnswerCount($option["idPoll_answers"])];
+        $pollData[] = [$poll->GetPollAnswerCount($option["idPoll_answers"]), $option["Answer"], $option["BarColour"]];
     }
 
     return [

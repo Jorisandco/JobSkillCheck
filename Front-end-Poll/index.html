@@ -10,30 +10,32 @@
 
 <div class="center">
     <!--Poll if poll id is added-->
-    <div class="poll">
-
-    </div>
-
-    <!--Poll creation div-->
     <div class="Create-poll">
-        <label for="poll-question">Create a Poll:</label>
-        <input type="text" id="poll-question" placeholder="Enter your poll question here"/>
-        <button id="add-answer">Add Answer</button>
-        <input type="datetime-local" id="poll-expiry"/>
-        <div class="answers">
-            <!--                answer with colour picker-->
-            <div class="selection">
-                <input type="text" class="answer-text" placeholder="Enter answer option"/>
-                <input type="color" class="answer-color" value="#ff0000"/>
-                <button class="remove-answer">Remove</button>
-            </div>
-            <div class="selection">
-                <input type="text" class="answer-text" placeholder="Enter answer option"/>
-                <input type="color" class="answer-color" value="#ff0000"/>
-                <button class="remove-answer">Remove</button>
-            </div>
+
+        <div id="poll">
+
         </div>
-        <button id="create-poll">Create Poll</button>
+        <!--Poll creation div-->
+        <div id="Create-pollForm">
+            <label for="poll-question">Create a Poll:</label>
+            <input type="text" id="poll-question" placeholder="Enter your poll question here"/>
+            <button id="add-answer">Add Answer</button>
+            <input type="datetime-local" id="poll-expiry"/>
+            <div class="answers">
+                <!--                answer with colour picker-->
+                <div class="selection">
+                    <input type="text" class="answer-text" placeholder="Enter answer option"/>
+                    <input type="color" class="answer-color" value="#ff0000"/>
+                    <button class="remove-answer">Remove</button>
+                </div>
+                <div class="selection">
+                    <input type="text" class="answer-text" placeholder="Enter answer option"/>
+                    <input type="color" class="answer-color" value="#ff0000"/>
+                    <button class="remove-answer">Remove</button>
+                </div>
+            </div>
+            <button id="create-poll">Create Poll</button>
+        </div>
     </div>
 
     <!--visible when not logged in -->

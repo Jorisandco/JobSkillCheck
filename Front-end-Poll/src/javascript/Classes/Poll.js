@@ -3,41 +3,54 @@ import {APICals} from "./API.js";
 import {Cookie} from "./Cookie.js";
 
 export class Poll {
-     LinkExtension = "/poll";
-     PollID;
+    LinkExtension = "/poll";
+    PollID;
+    answers = [];
 
     constructor(pollID) {
         this.PollID = pollID;
     }
 
-     async GetPollResults(){
+    async GetPollResults() {
         const api = new APICals();
         try {
-            const response = await api.post(this.LinkExtension + '/getPollResults', {
-                pollID: this.PollID
+            return await api.post(this.LinkExtension + '/get-poll-answers', {
+                POLL_ID: this.PollID
             });
-            return response.results;
+
         } catch (error) {
             console.error("Error fetching poll results:", error);
             return null;
         }
     }
 
-     async HasUserAnswered(userID){
+    async GetPoll() {
         const api = new APICals();
         try {
-            const response = await api.post(this.LinkExtension + '/hasUserAnswered', {
-                pollID: this.PollID,
-                userID: userID
+            return await api.post(this.LinkExtension + '/get-poll-data', {
+                POLL_ID: this.PollID
             });
-            return response.hasAnswered;
+
+        } catch (error) {
+            console.error("Error fetching poll data:", error);
+            return null;
+        }
+    }
+
+    async HasUserAnswered(sessionToken) {
+        const api = new APICals();
+        try {
+            return await api.post(this.LinkExtension + '/user-has-answered', {
+                POLL_ID: this.PollID,
+                Session: sessionToken
+            });
         } catch (error) {
             console.error("Error checking if user has answered:", error);
             return false;
         }
     }
 
-     async CreatePoll(question, answers, exp){
+    async CreatePoll(question, answers, exp) {
         const api = new APICals();
         try {
             const response = await api.post(this.LinkExtension + '/submit-poll', {
@@ -52,5 +65,81 @@ export class Poll {
             console.error("Error creating poll:", error);
             return false;
         }
+    }
+
+    AddPollToFrontend(answers, MainQuestion, expiry) {
+
+        let formPoll = `
+        <div class="poll-expiry">Poll expires on: ${expiry}</div>
+        <h3>${MainQuestion}</h3>
+        <form id="poll-form">
+    `;
+
+        answers.forEach(answer => {
+            formPoll += `
+            <div class="poll-answer">
+                <input 
+                    type="radio"
+                    id="answer-${answer.idPoll_answers}"
+                    name="poll-answer"   
+                    value="${answer.idPoll_answers}"
+                >
+                <label 
+                    for="answer-${answer.idPoll_answers}"
+                >
+                    ${answer.Answer}
+                </label>
+            </div>
+        `;
+        });
+
+        formPoll += `</form> <button id="submit-poll-answer">Submit Answer</button>`;
+
+        $("#poll").html(formPoll);
+
+        this.answers = answers;
+    }
+
+    RevealAnswers(answers) {
+        const totalVotes = answers.reduce(
+            (sum, a) => sum + a[0].total_answers,
+            0
+        ) || 1;
+
+        let html = `<div class="poll-results">`;
+
+        answers.forEach((a) => {
+            const votes = a[0].total_answers;
+            const text = a[1];
+            const color = a[2];
+            const percent = Math.round((votes / totalVotes) * 100);
+
+            html += `
+            <div class="poll-result">
+                <div class="poll-label">
+                    <span>${text}</span>
+                    <span>${percent}%</span>
+                </div>
+                <div class="poll-bar-bg">
+                    <div 
+                        class="poll-bar-fill"
+                        data-percent="${percent}"
+                        style="background:${color}; width:0">
+                    </div>
+                </div>
+            </div>
+        `;
+        });
+
+        html += `</div> <button id="retake-poll">Retake Poll</button>`;
+
+        $("#poll").append(html);
+
+        setTimeout(() => {
+            $(".poll-bar-fill").each(function () {
+                const percent = $(this).data("percent");
+                $(this).css("width", percent + "%");
+            });
+        }, 50);
     }
 }
