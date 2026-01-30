@@ -8,9 +8,9 @@ use classes\DataBase;
 
 class Poll extends DataBase
 {
-    public function GetPollAnswerCount($questionID) : array|null
+    public function GetPollAnswerCount($questionID): array|null
     {
-        try{
+        try {
             $this->connect();
 
             $query = "SELECT COUNT(*) AS total_answers FROM useranswers WHERE QUESTIONID = :question_id;";
@@ -24,10 +24,37 @@ class Poll extends DataBase
 
             $this->disconnect();
 
-            return $results;
+            return $results[0];
         } catch (\PDOException $e) {
             echo "Error: " . $e->getMessage();
             return null;
+        }
+    }
+
+    public function HasUserAnswered($userID, $pollID): bool
+    {
+        try {
+            $this->connect();
+
+            $query = "SELECT COUNT(*) AS answer_count 
+                      FROM useranswers 
+                      JOIN poll_answers ON useranswers.QUESTIONID = poll_answers.idPoll_answers 
+                      WHERE useranswers.USERID = :user_id AND poll_answers.PollID = :poll_id;";
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                'user_id' => $userID,
+                'poll_id' => $pollID
+            ]);
+
+            $result = $stmt->fetch();
+
+            $this->disconnect();
+
+            return $result['answer_count'] > 0;
+        } catch (\PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return false;
         }
     }
 
@@ -61,7 +88,7 @@ class Poll extends DataBase
         }
     }
 
-    public function CreatePoll($question, $userID, $expire, $pollAnswers) :bool | int
+    public function CreatePoll($question, $userID, $expire, $pollAnswers): bool|int
     {
         try {
             $this->connect();
@@ -97,7 +124,7 @@ class Poll extends DataBase
         }
     }
 
-    public function UpdatePoll($pollID, $question, $expires) :bool
+    public function UpdatePoll($pollID, $question, $expires): bool
     {
         try {
             $this->connect();
@@ -118,7 +145,7 @@ class Poll extends DataBase
         }
     }
 
-    public function UpdatePollQuestions($pollID, $pollAnswers) :bool
+    public function UpdatePollQuestions($pollID, $pollAnswers): bool
     {
         try {
             $this->connect();
@@ -142,7 +169,7 @@ class Poll extends DataBase
         }
     }
 
-    public function DeletePoll($pollID) :bool
+    public function DeletePoll($pollID): bool
     {
         try {
             $this->connect();
@@ -157,7 +184,7 @@ class Poll extends DataBase
         }
     }
 
-    public function VotePoll($userID, $answerID) :bool
+    public function VotePoll($userID, $answerID): bool
     {
         try {
             $this->connect();
@@ -169,11 +196,13 @@ class Poll extends DataBase
             ]);
 
             $existingVote = $stmt->fetch();
-            if ($existingVote["QUESTIONID"] === $answerID) {
+            if (!$existingVote) {
+                $existingVote = null;
+            }
+            if ($existingVote !== null && $existingVote["QUESTIONID"] === $answerID) {
                 return false;
             }
-
-            if($existingVote){
+            if ($existingVote) {
                 $sql = "DELETE FROM useranswers WHERE USERID = :user_id";
                 $stmt = $this->conn->prepare($sql);
                 $stmt->execute([
