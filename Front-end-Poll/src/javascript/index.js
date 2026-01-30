@@ -96,21 +96,27 @@ if (pollID === null) {
 }
 
 
+
 if (pollID) {
     $(document).ready(async () => {
         const poll = new Poll(pollID);
         const results = await poll.GetPoll();
         const hasUserAnswered = await poll.HasUserAnswered(user.sessionToken);
 
+        function expired() {
+            return new Date(results.data.Expires) < new Date();
+        }
+
         if (results.status === "success") {
-            if (!hasUserAnswered.data.has_answered) {
+            if (!hasUserAnswered.data.has_answered && !expired()) {
                 poll.AddPollToFrontend(results.data.answers, results.data.Question, results.data.Expires);
                 $("#Create-pollForm").css("display", "none");
-            } else {
+            }
+            else {
                 const pollResults = await poll.GetPollResults();
 
                 if (pollResults.status === "success") {
-                    poll.RevealAnswers(pollResults.data);
+                    poll.RevealAnswers(pollResults.data, expired());
                 } else {
                     console.error("Failed to fetch poll results.");
                 }

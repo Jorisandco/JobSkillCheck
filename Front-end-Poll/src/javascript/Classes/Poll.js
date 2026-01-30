@@ -100,7 +100,7 @@ export class Poll {
         this.answers = answers;
     }
 
-    RevealAnswers(answers) {
+    RevealAnswers(answers, expired = false) {
         const totalVotes = answers.reduce(
             (sum, a) => sum + a[0].total_answers,
             0
@@ -131,7 +131,7 @@ export class Poll {
         `;
         });
 
-        html += `</div> <button id="retake-poll">Retake Poll</button>`;
+        html += `</div> ${expired? "" : '<button id="retake-poll">Retake Poll</button>'}`;
 
         $("#poll").append(html);
 
