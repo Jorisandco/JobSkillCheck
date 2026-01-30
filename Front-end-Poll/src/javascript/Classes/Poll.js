@@ -52,14 +52,12 @@ export class Poll {
     async CreatePoll(question, answers, exp) {
         const api = new APICals();
         try {
-            const response = await api.post(this.LinkExtension + '/submit-poll', {
+            return await api.post(this.LinkExtension + '/submit-poll', {
                 QUESTION: question,
                 EXPIRES: exp,
                 ANSWERS: answers,
                 Session: Cookie.getCookie("Session")
             });
-
-            return response;
         } catch (error) {
             console.error("Error creating poll:", error);
             return false;
@@ -67,7 +65,6 @@ export class Poll {
     }
 
     AddPollToFrontend(answers, MainQuestion, expiry, loggedin = true) {
-
         let formPoll = `
         <div class="poll-expiry">Poll expires on: ${expiry}</div>
         <h3>${MainQuestion}</h3>
@@ -93,25 +90,22 @@ export class Poll {
         });
 
         formPoll += `</form> ${loggedin ? '<button id="submit-poll-answer">Submit Answer</button>' : ""}`;
-
         $("#poll").html(formPoll);
-
     }
 
     RevealAnswers(answers, question, expired = false) {
         const totalVotes = answers.reduce(
-            (sum, a) => sum + a[0].total_answers,
-            0
+            (sum, answer) => sum + answer[0].total_answers, 0
         ) || 1;
 
         console.log(question)
 
-        let html = `<div class="poll-results"> <h1>${question}</h1>`;
+        let html = `<div class="poll-results"> <h1>${question} <br> Total votes: ${totalVotes}</h1>`;
 
-        answers.forEach((a) => {
-            const votes = a[0].total_answers;
-            const text = a[1];
-            const color = a[2];
+        answers.forEach((answer) => {
+            const votes = answer[0].total_answers;
+            const text = answer[1];
+            const color = answer[2];
             const percent = Math.round((votes / totalVotes) * 100);
 
             html += `
